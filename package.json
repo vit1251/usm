@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Universal Schema Migration system provide way keep DB schema is updated",
   "main": "src/index.js",
+  "bin": {
+    "usm": "./bin/main.js"
+  },
   "type": "module",
   "scripts": {
     "start": "node ./src/index.js",

@@ -7,6 +7,8 @@ import { Command } from 'commander';
 import { createSchemaService } from './SchemaService.js';
 import { SchemaWriter } from './SchemaWriter.js';
 
+export const main = () => {
+
 const program = new Command();
 
 const settings = config();
@@ -153,3 +155,5 @@ program.command('status')
   });
 
 program.parse();
+
+};
