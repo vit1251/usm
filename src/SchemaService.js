@@ -9,7 +9,7 @@ export class SchemaService {
     }
 
     async createTable(name, callback) {
-        const schemaBuilder = new SchemaBuilder();
+        const schemaBuilder = new SchemaBuilder(name);
         const schema = await callback(schemaBuilder);
         console.log(schema);
     }
