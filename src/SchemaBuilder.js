@@ -34,7 +34,8 @@ export class SchemaBuilder {
         rows.push(`CREATE TABLE ${this.name} (`);
         const parts = [];
         for (const column of this.columns) {
-            parts.push(`    ${column.name} ${column.type}`);
+            const col = column.build();
+            parts.push(`    ${col}`);
         }
         rows.push(parts.join(",\n"));
         rows.push(');');

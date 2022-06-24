@@ -18,7 +18,7 @@ describe('SchemaBuilder', () => {
         });
         const got = schemaBuilder.build();
         const want = 'CREATE TABLE User (\n' +
-                     '    Id INT AUTOINCREMENT,\n' +
+                     '    Id INT AUTO_INCREMENT,\n' +
                      '    Email VARCHAR(512) NOT NULL\n' +
                      ');';
         assert.equal(got, want);
