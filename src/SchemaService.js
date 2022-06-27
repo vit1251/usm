@@ -80,6 +80,18 @@ export class SchemaService {
         return result;
     }
 
+    /**
+     * Restore apply migrations
+     *
+     */
+    async restoreApplyMigrations() {
+        const result = [];
+        const sql = 'SELECT migrationId, migrationDate FROM migration ORDER BY migrationDate';
+        const [results, fields] = await this.query(sql);
+        //
+        return result;
+    }
+
     async check() {
         const sql = 'SELECT 1 + 1 AS solution';
         const [results, fields] = await this.query(sql);
