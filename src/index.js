@@ -1,11 +1,14 @@
 
-import process from 'process';
+import { cwd, env } from 'process';
+import { randomUUID } from 'crypto';
 import { join } from 'path';
-import { readdir } from 'fs/promises';
+import { readdir, mkdir, writeFile } from 'fs/promises';
 import { config } from 'dotenv';
 import { Command } from 'commander';
 import { createSchemaService } from './SchemaService.js';
 import { SchemaWriter } from './SchemaWriter.js';
+import { ConfigTemplate } from './ConfigTemplate.js';
+import { MigrationTemplate } from './MigrationTemplate.js';
 
 export const main = () => {
 
@@ -16,10 +19,10 @@ const settings = config();
 
 const createConnOptions = () => {
     const options = {
-        host: process.env.USM_HOST,
-        username: process.env.USM_USERNAME,
-        password: process.env.USM_PASSWORD,
-        database: process.env.USM_DATABASE,
+        host: env.USM_HOST,
+        username: env.USM_USERNAME,
+        password: env.USM_PASSWORD,
+        database: env.USM_DATABASE,
     };
     return options;
 };
@@ -32,15 +35,43 @@ program
 program.command('init')
   .description('Initialize USM project in place')
   .action(async () => {
-    console.log(step);
-    console.log(options);
+    /* Step 1. Create directory */
+    const baseDir = cwd();
+    const migrationDir = join(baseDir, 'migration');
+    await mkdir(migrationDir, {
+        recursive: true,
+    });
+
+    /* Step 2. Create `dotenv` file */
+    const configTemplate = new ConfigTemplate();
+    const content = configTemplate.render();
+    const configPath = join(baseDir, '.env');
+    await writeFile(configPath, content);
+
+    /* Step 3. Show init information */
+    console.info(`Initialize USM project is complete.`);
+
   });
 
 program.command('create')
   .description('Create new migration')
   .action(async () => {
-    console.log(step);
-    console.log(options);
+    /* Step 1. Generate UUID with migration */
+    const migrationId = randomUUID();
+
+    /* Step 2. Write empty migration */
+    const migrationTemplate = new MigrationTemplate({
+        migrationId,
+    });
+    const content = migrationTemplate.render();
+    const baseDir = cwd();
+    const migrationName = `${migrationId}.js`;
+    const migrationPath = join(baseDir, 'migration', migrationName);
+    await writeFile(migrationPath, content);
+
+    /* Step 3. Show create information */
+    console.info(`Create USM migration ${migrationId} is complete.`);
+
   });
 
 program.command('reverse')
@@ -84,7 +115,7 @@ program.command('up')
     console.log(step);
     console.log(options);
 
-    const baseDir = process.cwd();
+    const baseDir = cwd();
     const path = join(baseDir, 'migration');
 
     console.log(`Path ${path}...`);
