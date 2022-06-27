@@ -1,15 +1,19 @@
 
+import { randomUUID } from 'crypto';
+
 export class MigrationTemplate {
 
     /**
      * Create migration empty template
      *
      */
-    constructor({ migrationId = '' } = {}) {
-        this.author = 'Anonymous <void@example.com>';
-        this.createAt = new Date();
+    constructor({ migrationId, createAt, author = 'Anonymous <void@example.com>' }) {
+        this.author = author;
+        createAt = createAt ?? new Date();
+        this.createAt = createAt.toISOString();
         this.migrationId = migrationId;
     }
+
 
     render() {
         const items = [];

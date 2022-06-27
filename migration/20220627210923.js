@@ -2,8 +2,8 @@
 export default {
 
     author: 'Vitold Sedyshev <vit1251@gmail.com>',
-    date: '2022-06-24 21:08:10 +03:00',
-    id: '31f766fc-b523-4d26-a5b2-4aaa815d5eff',
+    date: '2022-06-27T21:09:23.666Z',
+    id: '60fff39d-15f5-44ad-b708-a9bf1571fbfb',
 
     migrateUp: async (service, conn) => {
 
@@ -42,4 +42,4 @@ export default {
 
     },
 
-};
+}
