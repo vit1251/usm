@@ -1,3 +1,4 @@
+.migration
 .env
 node_modules
 draft_*.js

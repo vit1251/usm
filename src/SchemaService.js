@@ -22,8 +22,6 @@ export class SchemaService {
                 if (error) {
                     reject(error);
                 } else {
-                    console.log(`result => `, results);
-                    console.log(`fields => `, fields);
                     resolve([results, fields]);
                 }
             });
@@ -86,16 +84,10 @@ export class SchemaService {
      */
     async restoreApplyMigrations() {
         const result = [];
-        const sql = 'SELECT migrationId, migrationDate FROM migration ORDER BY migrationDate';
+        const sql = 'SELECT migration_id, apply_at FROM migration ORDER BY apply_at ASC';
         const [results, fields] = await this.query(sql);
         //
         return result;
-    }
-
-    async check() {
-        const sql = 'SELECT 1 + 1 AS solution';
-        const [results, fields] = await this.query(sql);
-        //console.log('The solution is: ', results[0].solution);
     }
 
     async createTable(name, callback) {
@@ -128,11 +120,16 @@ export const createSchemaService = async (options, callback) => {
         ...options,
     });
 
+    /* Step 1. Start session */
+    console.log('---> Open connection...');
     conn.connect();
 
+    /* Step 2. Processing */
     const service = new SchemaService(conn);
     await callback(service);
 
+    /* Step 3. Close connection */
+    console.log('---> Close connection...');
     conn.end();
 
 };

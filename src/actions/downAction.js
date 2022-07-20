@@ -1,4 +1,6 @@
 
+import { createConnOptions } from '../BaseConfig.js';
+
 /**
  * Down action
  *
@@ -9,7 +11,9 @@ export const downAction = async (step, options) => {
     const connOptions = createConnOptions();
 
     await createSchemaService(connOptions, async (service) => {
-        service.check();
+
+        // TODO - migration check ...
+
     });
 
 };

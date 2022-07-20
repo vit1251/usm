@@ -1,4 +1,11 @@
 
+import { randomUUID } from 'crypto';
+import { makeDate } from '../DateUtil.js';
+import { MigrationTemplate } from '../MigrationTemplate.js';
+import { cwd } from 'process';
+import { join } from 'path';
+import { writeFile } from 'fs/promises';
+
 /**
  * Create a new repository migration entity
  *
@@ -17,7 +24,7 @@ export const createAction = async () => {
     const content = migrationTemplate.render();
     const baseDir = cwd();
     const migrationName = `${createAt}.js`;
-    const migrationPath = join(baseDir, 'migration', migrationName);
+    const migrationPath = join(baseDir, '.migration', migrationName);
     await writeFile(migrationPath, content);
 
     /* Step 3. Show create information */

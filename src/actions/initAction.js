@@ -1,12 +1,18 @@
 
+import { cwd } from 'process';
+import { join } from 'path';
+import { mkdir, writeFile } from 'fs/promises';
+import { ConfigTemplate } from '../ConfigTemplate.js';
+
 /**
  * Initialize USM repository or reinitialize
  *
  */
 export const initAction = async () => {
+
     /* Step 1. Create directory */
     const baseDir = cwd();
-    const migrationDir = join(baseDir, 'migration');
+    const migrationDir = join(baseDir, '.migration');
     await mkdir(migrationDir, {
         recursive: true,
     });

@@ -1,4 +1,6 @@
 
+import { createConnOptions } from '../BaseConfig.js';
+
 /**
  * Up action
  *
@@ -9,7 +11,7 @@ export const upAction = async (step, options) => {
     console.log(options);
 
         const baseDir = cwd();
-        const path = join(baseDir, 'migration');
+        const path = join(baseDir, '.migration');
 
         console.log(`Path ${path}...`);
 
