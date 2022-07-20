@@ -1,208 +1,70 @@
 
-import { cwd, env } from 'process';
+import { cwd } from 'process';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { readdir, mkdir, writeFile } from 'fs/promises';
-import { config } from 'dotenv';
+
 import { Command } from 'commander';
-import { createSchemaService } from './SchemaService.js';
 import { SchemaWriter } from './SchemaWriter.js';
 import { ConfigTemplate } from './ConfigTemplate.js';
 import { MigrationTemplate } from './MigrationTemplate.js';
+import { MigrationSchemaInstaller } from './MigrationSchemaInstaller.js';
 import { makeDate } from './DateUtil.js';
+import { createConnOptions } from './BaseConfig.js';
+import {
+    initAction,
+    statusAction,
+    installAction,
+    createAction,
+    reverseAction,
+    upAction,
+    downAction,
+    checkAction,
+} from './actions/index.js';
 
 export const main = () => {
 
-const program = new Command();
+    const program = new Command();
 
-const settings = config();
-//console.log(settings);
+    program
+      .name('usm')
+      .description('CLI to universal schema migration utilities')
+      .version('1.0.0');
 
-const createConnOptions = () => {
-    const options = {
-        host: env.USM_HOST,
-        username: env.USM_USERNAME,
-        password: env.USM_PASSWORD,
-        database: env.USM_DATABASE,
-    };
-    return options;
-};
+    program.command('init')
+      .description('Create an empty USM repository or reinitialize an existing one')
+      .action(initAction);
 
-program
-  .name('usm')
-  .description('CLI to universal schema migration utilities')
-  .version('1.0.0');
+    program.command('install')
+      .description('Install a USM schema into a new database') // TODO - ... or reinitialize an existing one')
+      .action(installAction);
 
-program.command('init')
-  .description('Initialize USM project in place')
-  .action(async () => {
-    /* Step 1. Create directory */
-    const baseDir = cwd();
-    const migrationDir = join(baseDir, 'migration');
-    await mkdir(migrationDir, {
-        recursive: true,
-    });
+    program.command('create')
+      .description('Create new migration')
+      .action(createAction);
 
-    /* Step 2. Create `dotenv` file */
-    const configTemplate = new ConfigTemplate();
-    const content = configTemplate.render();
-    const configPath = join(baseDir, '.env');
-    await writeFile(configPath, content);
+    program.command('reverse')
+      .description('Reverse engineering MySQL schema')
+      .action(reverseAction);
 
-    /* Step 3. Show init information */
-    console.info(`Initialize USM project is complete.`);
+    program.command('up')
+      .description('Migration up')
+      .argument('[step]', 'how many steps migration should do')
+      .option('-v, --verbose', 'show additional debug messages and performance benchmarks')
+      .action(upAction);
 
-  });
+    program.command('down')
+      .description('Migration down')
+      .action(downAction);
 
-program.command('create')
-  .description('Create new migration')
-  .action(async () => {
-    /* Step 1. Generate UUID with migration */
-    const migrationId = randomUUID();
-    const stamp = new Date();
-    const createAt = makeDate(stamp);
+    program.command('check')
+      .description('Check MySQL server version and parameters')
+      .action(checkAction);
 
-    /* Step 2. Write empty migration */
-    const migrationTemplate = new MigrationTemplate({
-        migrationId,
-        createAt: stamp,
-    });
-    const content = migrationTemplate.render();
-    const baseDir = cwd();
-    const migrationName = `${createAt}.js`;
-    const migrationPath = join(baseDir, 'migration', migrationName);
-    await writeFile(migrationPath, content);
+    program.command('status')
+      .description('Check migration status')
+      .action(statusAction);
 
-    /* Step 3. Show create information */
-    console.info(`Create USM migration ${createAt} is complete.`);
-
-  });
-
-program.command('reverse')
-  .description('Reverse engineering MySQL schema')
-  .action(async () => {
-
-    /* Step 1. Restore database connection options */
-    const connOptions = createConnOptions();
-
-    /* Create service context */
-    await createSchemaService(connOptions, async (service) => {
-
-        /* Step 1. Determine database tables */
-        const tables = await service.showTables();
-
-        /* Step 2. Processing every database and receive schemas */
-        for (const table of tables) {
-
-            console.log(`--> Retreive schema for "${table}".`);
-
-            /* Step 1. Receive table schema */
-            const schema = await service.describeTable(table);
-
-            /* Step 2. Write on disk */
-            const schemaWriter = new SchemaWriter(`draft_${table}.js`);
-            await schemaWriter.write(table, schema);
-
-        }
-
-    });
-
-  });
-
-program.command('up')
-  .description('Migration up')
-  .argument('[step]', 'how many steps migration should do')
-  .option('-v, --verbose', 'show additional debug messages and performance benchmarks')
-  .action(async (step, options) => {
-    console.log(step);
-    console.log(options);
-
-    const baseDir = cwd();
-    const path = join(baseDir, 'migration');
-
-    console.log(`Path ${path}...`);
-
-    /* Step 1. Restore database connection options */
-    const connOptions = createConnOptions();
-
-    /* Create service context */
-    await createSchemaService(connOptions, async (service) => {
-
-        const migrations = await readdir(path);
-        for (const migr of migrations) {
-            console.log(`Process migrations ${migr}...`);
-            const migration = join(path, migr);
-            const v = await import(migration);
-            console.log(v);
-            const { default: m } = v;
-            const {migrateUp, migrateDown} = m;
-            console.log(migrateUp);
-            await migrateUp(service, conn);
-            /* Step . Save apply migation at system table */
-            await service.registerMigration()
-        }
-
-    });
-
-  });
-
-program.command('down')
-  .description('Migration down')
-  .action(async (step, options) => {
-
-    /* Step 1. Restore database connection options */
-    const connOptions = createConnOptions();
-
-    await createSchemaService(connOptions, async (service) => {
-        service.check();
-    });
-
-  });
-
-program.command('check')
-  .description('Check MySQL settings')
-  .argument('[step]', 'how many steps migration should do')
-  .option('-v, --verbose', 'show additional debug messages and performance benchmarks')
-  .action(async (step, options) => {
-
-    /* Step 1. Restore database connection options */
-    const connOptions = createConnOptions();
-
-    await createSchemaService(connOptions, async (service) => {
-        service.check();
-    });
-
-  });
-
-program.command('status')
-  .description('Check migration status')
-  .action(async (step, options) => {
-
-    /* Step 1. Restore migrations */
-    const migrations = [];
-    const applyMigrations = [];
-
-    /* Step 2. Restore database connection options */
-    const connOptions = createConnOptions();
-    await createSchemaService(connOptions, async (service) => {
-
-        /* Step 1. Restore apply migrations */
-        try {
-            const withMigrations = await service.restoreApplyMigrations();
-            for (const withMigration of withMigrations) {
-                applyMigrations.push(withMigration);
-            }
-        } catch (err) {
-            console.error(`Error: database no UMS migrations setup (${err.message}). Use 'usm up' to initialize.`);
-        }
-
-    });
-
-    /* Step 3. Show difference between exists and apply migrations */
-    // TODO - implement it later ...
-
-  });
-
-program.parse();
+    program.parse();
 
 };
