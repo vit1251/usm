@@ -9,17 +9,30 @@ import { createConnOptions } from '../BaseConfig.js';
 import { createSchemaService } from '../SchemaService.js';
 import { MigrationService } from '../MigrationService.js';
 
+const renderMigration = (migration) => {
+    const { id, summary } = migration;
+    const row = chalk.yellow(`Apply ${id}...`);
+    stdout.write(`${row}\n`);
+};
+
 const applyMigration = async (migration) => {
     const connOptions = createConnOptions();
     await createSchemaService(connOptions, async (service) => {
 
-        /* Step 1. Apply migration */
-        const {migrateUp} = migration;
-        console.log(migrateUp);
-        await migrateUp(service, service.conn);
+        /* Step 1. Report migration activity */
+        renderMigration(migration);
 
-        /* Step 2. Register applyed migation */
-        await service.registerMigration(migration);
+        /* Step 2. Apply migration */
+        try {
+            /* Step 1. Apply migration */
+            const {migrateUp} = migration;
+            //console.log(migrateUp);
+            await migrateUp(service, service.conn);
+            /* Step 2. Register applyed migation */
+            await service.registerMigration(migration);
+        } catch (err) {
+            renderError(`${err}`);
+        }
 
     });
 };

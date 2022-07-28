@@ -13,13 +13,15 @@ export class SchemaService {
     }
 
     /**
-     * Database query
+     * Database SQL query
      *
-     * @return {Promise<
+     * @param {String} query
+     * @param {Array} params
+     * @return {Promise<Array<Array>>}
      */
-    query(query) {
+    query(query, params = []) {
         return new Promise((resolve, reject) => {
-            this.conn.query(query, (error, results, fields) => {
+            this.conn.query(query, params, (error, results, fields) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -87,9 +89,14 @@ export class SchemaService {
         const result = [];
         const sql = 'SELECT migration_id, apply_at FROM migration ORDER BY apply_at ASC';
         const [results, fields] = await this.query(sql);
-        for (const row in results) {
+        for (const row of results) {
             console.log(row);
-            const m = new Migration({});
+            const { migration_id, apply_at } = row;
+            const m = new Migration({
+                id: migration_id,
+                applyed: true,
+                applyAt: apply_at,
+            });
             result.push(m);
         }
         return result;
@@ -101,16 +108,45 @@ export class SchemaService {
         console.log(schema);
     }
 
-    async dropTable() {
+    /**
+     * Drop table
+     *
+     * @param {String} name
+     * @param {String} options
+     */
+    async dropTable(name, options = {}) {
+        const { ifExists = true } = options;
+        if (ifExists) {
+            const query = 'DROP TABLE IF EXISTS ??';
+            const [results, fields] = await this.query(query, [name]);
+        } else {
+            const query = 'DROP TABLE ??';
+            const [results, fields] = await this.query(query, [name]);
+        }
     }
 
-    async backupTable() {
+    /**
+     * Register apply migration
+     *
+     * @param {Migration} m
+     */
+    async registerMigration(m) {
+        const { id } = m;
+        const stamp = new Date();
+        const query = 'INSERT INTO migration (migration_id, apply_at) VALUES (?, ?)';
+        const [results, fields] = await this.query(query, [id, stamp]);
     }
 
-    async restoreTable() {
-    }
-
-    async registerMigration() {
+    /**
+     * Unregister migration
+     *
+     * @param {Migration} m
+     */
+    async unregisterMigration(m) {
+        const { id } = m;
+        const stamp = new Date();
+        const query = 'DELETE FROM migration WHERE migration_id = ?';
+        const [results, fields] = await this.query(query, [id]);
     }
 
 }

@@ -16,6 +16,7 @@ import {
     applyAction,
     restoreAction,
     checkAction,
+    logAction,
 } from './actions/index.js';
 
 export const main = () => {
@@ -64,6 +65,10 @@ export const main = () => {
     program.command('index')
       .description('Show migration index')
       .action(indexAction);
+
+    program.command('log')
+      .description('Show apply migration log')
+      .action(logAction);
 
     program.parse();
 

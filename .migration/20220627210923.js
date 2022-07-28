@@ -35,9 +35,6 @@ export default {
 
     migrateDown: async (service, conn) => {
 
-        /* Step 0. Backup `user` data */
-        await service.saveTableBackup(`user`);
-
         /* Step 1. Drop `user` table */
         await service.dropTable(`user`);
 

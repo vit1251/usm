@@ -46,7 +46,13 @@ export const statusAction = async (step, options) => {
         /* Step 1. Restore apply migrations */
         const applyMigrations = await service.restoreApplyMigrations();
         for (const applyMigration of applyMigrations) {
-            console.log(applyMigration);
+            /* Step 1. Update status*/
+            for (const migration of migrations) {
+                if (migration.id === applyMigration.id) {
+                    migration.applyed = true;
+                }
+            }
+            //console.log(applyMigration);
         }
 
     });

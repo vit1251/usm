@@ -8,6 +8,7 @@ import { statusAction } from './statusAction.js';
 import { indexAction } from './indexAction.js';
 import { applyAction } from './applyAction.js';
 import { restoreAction } from './restoreAction.js';
+import { logAction } from './logAction.js';
 
 export {
     createAction,
@@ -19,4 +20,5 @@ export {
     indexAction,
     applyAction,
     restoreAction,
+    logAction,
 }
