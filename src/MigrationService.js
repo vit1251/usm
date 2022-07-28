@@ -53,12 +53,10 @@ export class MigrationService {
             const migration = join(path, migr);
             /* Step 3. Import migration meta attrinutes */
             const v = await import(migration);
-            console.log(v);
             const { default: module } = v;
-            const { author, date, id, migrateUp, migrateDown } = module;
+            const { author, date, id, migrateUp, migrateDown, summary } = module;
             /* Step 4. Populate migration */
-            const m = new Migration({ author, date, id, migrateUp, migrateDown });
-            m.module = module;
+            const m = new Migration({ author, date, id, migrateUp, migrateDown, summary });
             /* Step 5. Store results */
             result.push(m);
         }

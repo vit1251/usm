@@ -4,6 +4,7 @@ export default {
     author: 'Vitold Sedyshev <vit1251@gmail.com>',
     date: '2022-06-27T21:09:23.666Z',
     id: '60fff39d-15f5-44ad-b708-a9bf1571fbfb',
+    summary: 'Create "user" scheme',
 
     migrateUp: async (service, conn) => {
 
