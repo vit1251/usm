@@ -1,15 +1,17 @@
 
+const USER_TABLE_NAME = 'user';
+
 export default {
 
     author: 'Vitold Sedyshev <vit1251@gmail.com>',
     date: '2022-06-27T21:09:23.666Z',
     id: '60fff39d-15f5-44ad-b708-a9bf1571fbfb',
-    summary: 'Create "user" scheme',
+    summary: `Create "${USER_TABLE_NAME}" scheme`,
 
     migrateUp: async (service, conn) => {
 
         /* Step 1. Create `user` table */
-        await service.createTable(`user`, async (schemaBuilder) => {
+        await service.createTable(USER_TABLE_NAME, async (schemaBuilder) => {
             schemaBuilder.createColumn(`id`, {
                 auto_increment: true,
                 type: 'BIGINT',
@@ -36,7 +38,7 @@ export default {
     migrateDown: async (service, conn) => {
 
         /* Step 1. Drop `user` table */
-        await service.dropTable(`user`);
+        await service.dropTable(USER_TABLE_NAME);
 
     },
 

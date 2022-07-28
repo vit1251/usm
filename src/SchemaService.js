@@ -90,12 +90,10 @@ export class SchemaService {
         const sql = 'SELECT migration_id, apply_at FROM migration ORDER BY apply_at ASC';
         const [results, fields] = await this.query(sql);
         for (const row of results) {
-            console.log(row);
             const { migration_id, apply_at } = row;
             const m = new Migration({
                 id: migration_id,
                 applyed: true,
-                applyAt: apply_at,
             });
             result.push(m);
         }

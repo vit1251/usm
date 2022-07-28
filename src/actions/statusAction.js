@@ -52,7 +52,6 @@ export const statusAction = async (step, options) => {
                     migration.applyed = true;
                 }
             }
-            //console.log(applyMigration);
         }
 
     });
