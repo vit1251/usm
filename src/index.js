@@ -13,8 +13,8 @@ import {
     installAction,
     createAction,
     reverseAction,
-    upAction,
-    downAction,
+    applyAction,
+    restoreAction,
     checkAction,
 } from './actions/index.js';
 
@@ -43,15 +43,15 @@ export const main = () => {
       .description('Reverse engineering MySQL schema')
       .action(reverseAction);
 
-    program.command('up')
-      .description('Migration up')
-      .argument('[step]', 'how many steps migration should do')
-      .option('-v, --verbose', 'show additional debug messages and performance benchmarks')
-      .action(upAction);
+    program.command('apply')
+      .description('Apply migration')
+      .argument('[id]', 'migration id')
+      .action(applyAction);
 
-    program.command('down')
-      .description('Migration down')
-      .action(downAction);
+    program.command('restore')
+      .description('Restore (revoke) schema upgrade migration script')
+      .argument('[id]', 'migration id')
+      .action(restoreAction);
 
     program.command('check')
       .description('Check MySQL server version and parameters')
