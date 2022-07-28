@@ -1,4 +1,8 @@
 
+import { createConnOptions } from '../BaseConfig.js';
+import { createSchemaService } from '../SchemaService.js';
+import { SchemaWriter } from '../SchemaWriter.js';
+
 /**
  * Reverse enginering ERD schema and save as migrations
  *
