@@ -17,7 +17,7 @@ const renderMigration = (m) => {
         const row = chalk.green(`applyed: ${id} - ${summary}`)
         stdout.write(`        ${row}\n`);
     } else {
-        const row = chalk.red(`ready: ${id} - ${summary}`);
+        const row = chalk.red(`new migration: ${id} - ${summary}`);
         stdout.write(`        ${row}\n`);
     }
 };
