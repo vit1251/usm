@@ -3,6 +3,7 @@ import { createConnection } from 'mysql';
 
 import { SchemaBuilder } from './SchemaBuilder.js';
 import { SchemaColumn } from './SchemaColumn.js';
+import { Migration } from './Migration.js';
 
 export class SchemaService {
 
@@ -86,7 +87,11 @@ export class SchemaService {
         const result = [];
         const sql = 'SELECT migration_id, apply_at FROM migration ORDER BY apply_at ASC';
         const [results, fields] = await this.query(sql);
-        //
+        for (const row in results) {
+            console.log(row);
+            const m = new Migration({});
+            result.push(m);
+        }
         return result;
     }
 

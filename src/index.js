@@ -9,6 +9,7 @@ import { createConnOptions } from './BaseConfig.js';
 import {
     initAction,
     statusAction,
+    indexAction,
     installAction,
     createAction,
     reverseAction,
@@ -59,6 +60,10 @@ export const main = () => {
     program.command('status')
       .description('Check migration status')
       .action(statusAction);
+
+    program.command('index')
+      .description('Show migration index')
+      .action(indexAction);
 
     program.parse();
 

@@ -1,5 +1,10 @@
 
+import { cwd } from 'process';
+import { readdir } from 'fs/promises';
+import { join } from 'path';
 import { createConnOptions } from '../BaseConfig.js';
+import { createSchemaService } from '../SchemaService.js';
+import { MigrationService } from '../MigrationService.js';
 
 /**
  * Up action
@@ -10,31 +15,26 @@ export const upAction = async (step, options) => {
     console.log(step);
     console.log(options);
 
-        const baseDir = cwd();
-        const path = join(baseDir, '.migration');
+    /* Step 1. Restore database connection options */
+    const connOptions = createConnOptions();
+    const migrationService = new MigrationService();
+    const migrations = await migrationService.searchMigrations();
 
-        console.log(`Path ${path}...`);
+    /* Create service context */
+    await createSchemaService(connOptions, async (service) => {
+        for (const m of migrations) {
+            /* Step 1. Check migration is applyed */
+            // TODO - check migration is apply ...
 
-        /* Step 1. Restore database connection options */
-        const connOptions = createConnOptions();
+            /* Step 2. Apply migration */
+            const {migrateUp} = m;
+            console.log(migrateUp);
+            await migrateUp(service, conn);
 
-        /* Create service context */
-        await createSchemaService(connOptions, async (service) => {
+            /* Step 3. Save apply migation */
+            await service.registerMigration(m);
 
-            const migrations = await readdir(path);
-            for (const migr of migrations) {
-                console.log(`Process migrations ${migr}...`);
-                const migration = join(path, migr);
-                const v = await import(migration);
-                console.log(v);
-                const { default: m } = v;
-                const {migrateUp, migrateDown} = m;
-                console.log(migrateUp);
-                await migrateUp(service, conn);
-                /* Step . Save apply migation at system table */
-                await service.registerMigration()
-            }
-
-        });
+        }
+    });
 
 };

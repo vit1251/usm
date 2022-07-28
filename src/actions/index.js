@@ -7,6 +7,7 @@ import { installAction } from './installAction.js';
 import { reverseAction } from './reverseAction.js';
 import { statusAction } from './statusAction.js';
 import { upAction } from './upAction.js';
+import { indexAction } from './indexAction.js';
 
 export {
     createAction,
@@ -17,5 +18,6 @@ export {
     reverseAction,
     statusAction,
     upAction,
+    indexAction,
 }
 
