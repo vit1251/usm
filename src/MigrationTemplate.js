@@ -6,12 +6,13 @@ export class MigrationTemplate {
     /**
      * Create migration empty template
      *
+     * @param {Migration} migration
      */
-    constructor({ migrationId, createAt, author = 'Anonymous <void@example.com>', summary = 'No summary' }) {
+    constructor(migration) {
+        const { id, created_on, author = 'Anonymous <void@example.com>', summary = 'No summary' } = migration;
         this.author = author;
-        createAt = createAt ?? new Date();
-        this.createAt = createAt.toISOString();
-        this.migrationId = migrationId;
+        this.created_on = created_on ? created_on : new Date();
+        this.id = id;
         this.summary = summary;
     }
 
@@ -26,8 +27,8 @@ export class MigrationTemplate {
         items.push(``);
 
         items.push(`    author: '${this.author}',`);
-        items.push(`    date: '${this.createAt}',`);
-        items.push(`    id: '${this.migrationId}',`);
+        items.push(`    date: '${this.created_on.toISOString()}',`);
+        items.push(`    id: '${this.id}',`);
         items.push(`    summary: '${this.summary}',`);
 
         items.push(``);

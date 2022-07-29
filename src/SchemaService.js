@@ -124,6 +124,12 @@ export class SchemaService {
     }
 
     /**
+     * Initialize migration registry
+     */
+    async initializeMigrationRegistry() {
+    }
+
+    /**
      * Register apply migration
      *
      * @param {Migration} m

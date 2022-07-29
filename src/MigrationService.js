@@ -15,22 +15,30 @@ export class MigrationService {
      * @param {Object} options
      */
     async createEmptyMigration(options = {}) {
+
+        /* 1 */
+        /* 2 */
         const baseDir = cwd();
         const defaultPath = join(baseDir, '.migration');
         const {
             path = join(defaultPath, "1.js"),
-            migrationId = randomUUID(),
-            stamp,
+            id = randomUUID(),
+            created_on = new Date(),
         } = options;
 
-        /* Step 1. Write empty migration */
-        const migrationTemplate = new MigrationTemplate({
-            migrationId,
-            createAt: stamp,
+        /* Step 3. Create new migration */
+        const m = new Migration({
+            path,
+            created_on,
+            id,
         });
-        const content = migrationTemplate.render();
-        await writeFile(path, content);
 
+        /* Step 4. Write migration on disk */
+        const migrationTemplate = new MigrationTemplate(m);
+        const content = migrationTemplate.render();
+        await writeFile(m.path, content);
+
+        return m;
     }
 
     /**
